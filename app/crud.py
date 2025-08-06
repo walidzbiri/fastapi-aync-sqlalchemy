@@ -1,13 +1,16 @@
+from logging import getLogger
 from fastapi import HTTPException
 from sqlalchemy import delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import models, schemas
 
+logger = getLogger(__name__)
 
 async def get_user(db: AsyncSession, user_id: int):
     db_user = await db.get(models.User, user_id)
     if db_user is None:
+        logger.warning(f"User with id: {user_id} not found")
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 

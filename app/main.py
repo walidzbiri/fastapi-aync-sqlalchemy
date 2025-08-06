@@ -1,19 +1,28 @@
 from contextlib import asynccontextmanager
+import logging
+from logging import getLogger
+from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI
 
 from app.db import Base, engine
 from app import crud, schemas
 
 from app.deps import SessionDep
+from app.logging import configure_logging
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    configure_logging()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
 
+
+#logging.config.fileConfig('logger.ini', disable_existing_loggers=False)
+
 app = FastAPI(lifespan=lifespan)
+app.add_middleware(CorrelationIdMiddleware)
 
 
 @app.post("/users/", response_model=schemas.User)
