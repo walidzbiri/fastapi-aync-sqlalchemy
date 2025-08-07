@@ -1,6 +1,6 @@
 from logging import getLogger
 from fastapi import HTTPException
-from sqlalchemy import delete, insert, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import models, schemas
@@ -34,6 +34,7 @@ async def get_users(db: AsyncSession, skip: int = 0, limit: int = 100):
 async def create_user(db: AsyncSession, user: schemas.UserCreate):
     db_user = await get_user_by_email(db, email=user.email)
     if db_user:
+        logger.warning(f"User with email: {user.email} already registered")
         raise HTTPException(status_code=400, detail="Email already registered")
     fake_hashed_password = user.password + "notreallyhashed"
     db_user=models.User(email=user.email, hashed_password=fake_hashed_password)
@@ -46,6 +47,7 @@ async def create_user(db: AsyncSession, user: schemas.UserCreate):
 async def delete_user(db: AsyncSession, user_id: int):
     db_user=await db.get(models.User, user_id)
     if not db_user:
+        logger.warning(f"User with id: {user_id} not found")
         raise HTTPException(status_code=404, detail="User not found")
     await db.delete(db_user)
     await db.commit()

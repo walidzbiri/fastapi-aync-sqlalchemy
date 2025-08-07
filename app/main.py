@@ -9,6 +9,7 @@ from app import crud, schemas
 
 from app.deps import SessionDep
 from app.logging import configure_logging
+from app.middlewares import RequestContextMiddleware
 
 
 @asynccontextmanager
@@ -22,7 +23,9 @@ async def lifespan(app: FastAPI):
 #logging.config.fileConfig('logger.ini', disable_existing_loggers=False)
 
 app = FastAPI(lifespan=lifespan)
+app.add_middleware(RequestContextMiddleware)
 app.add_middleware(CorrelationIdMiddleware)
+
 
 
 @app.post("/users/", response_model=schemas.User)

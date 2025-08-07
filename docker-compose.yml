@@ -37,6 +37,8 @@ services:
         # Rebuild the image if dependencies change by checking uv.lock
         - action: rebuild
           path: ./uv.lock
+    volumes:
+      - ./app/app.log:/app/app.log
 
 volumes:
     postgres:

@@ -1,13 +1,35 @@
 from logging.config import dictConfig
+import logging
+import json
 
 
+class CustomJsonFormatter(logging.Formatter):
+    def format(self, record):
+        # Create the log record dict with renamed fields
+        log_record = {
+            'timestamp': self.formatTime(record, '%Y-%m-%dT%H:%M:%SZ'),
+            'level': record.levelname,
+            'correlation_id': getattr(record, 'correlation_id', '-'),
+            'logger': f"{record.name}:{record.lineno}",
+            'message': record.getMessage()
+        }
+        for attr in [
+            'duration', 'method', 'path', 'status_code',
+            'request_body', 'response_body', 'query_params',
+            'client', 'user_agent', 'exception', 'traceback'
+        ]:
+            if hasattr(record, attr):
+                log_record[attr] = getattr(record, attr)
+        
+        return json.dumps(log_record)
+    
 
 def configure_logging() -> None:
     dictConfig(
         {
             'version': 1,
             'disable_existing_loggers': False,
-            'filters': {  # correlation ID filter must be added here to make the %(correlation_id)s formatter work
+            'filters': {
                 'correlation_id': {
                     '()': 'asgi_correlation_id.CorrelationIdFilter',
                     'uuid_length': 32,
@@ -15,31 +37,29 @@ def configure_logging() -> None:
                 },
             },
             'formatters': {
-                'console': {
-                    'class': 'logging.Formatter',
-                    'datefmt': '%H:%M:%S',
-                    # formatter decides how our console logs look, and what info is included.
-                    # adding %(correlation_id)s to this format is what make correlation IDs appear in our logs
-                    'format': '%(levelname)s:\t\b%(asctime)s %(name)s:%(lineno)d [%(correlation_id)s] %(message)s',
+                'json': {
+                    '()': CustomJsonFormatter,
                 },
             },
             'handlers': {
                 'console': {
                     'class': 'logging.StreamHandler',
-                    # Filter must be declared in the handler, otherwise it won't be included
                     'filters': ['correlation_id'],
-                    'formatter': 'console',
+                    'formatter': 'json',
+                },
+                'file': {
+                    'class': 'logging.FileHandler',
+                    'filename': "app.log",
+                    'filters': ['correlation_id'],
+                    'formatter': 'json',
                 },
             },
-            # Loggers can be specified to set the log-level to log, and which handlers to use
             'loggers': {
-                # project logger
-                'app': {'handlers': ['console'], 'level': 'DEBUG'},
-                # third-party package loggers
-                'sqlalchemy': {'handlers': ['console'], 'level': 'DEBUG'},
-                'httpx': {'handlers': ['console'], 'level': 'INFO'},
-                'asgi_correlation_id': {'handlers': ['console'], 'level': 'WARNING'},
-                'uvicorn': {'handlers': ['console'], 'level': 'INFO'},
+                'app': {'handlers': ['console', 'file'], 'level': 'INFO'},
+                'sqlalchemy': {'handlers': ['console', 'file'], 'level': 'ERROR'},
+                'httpx': {'handlers': ['console', 'file'], 'level': 'INFO'},
+                'asgi_correlation_id': {'handlers': ['console', 'file'], 'level': 'WARNING'},
+                'uvicorn': {'handlers': ['console', 'file'], 'level': 'INFO'},
             },
         }
     )
