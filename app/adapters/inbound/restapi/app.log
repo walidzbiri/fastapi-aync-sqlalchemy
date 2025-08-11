@@ -1,0 +1,15 @@
+{"timestamp": "2025-08-11T13:17:16Z", "level": "INFO", "correlation_id": "-", "logger": "uvicorn.error:62", "message": "Application startup complete."}
+{"timestamp": "2025-08-11T13:18:00Z", "level": "INFO", "correlation_id": "-", "logger": "uvicorn.error:264", "message": "Shutting down"}
+{"timestamp": "2025-08-11T13:18:00Z", "level": "INFO", "correlation_id": "-", "logger": "uvicorn.error:67", "message": "Waiting for application shutdown."}
+{"timestamp": "2025-08-11T13:18:00Z", "level": "INFO", "correlation_id": "-", "logger": "uvicorn.error:76", "message": "Application shutdown complete."}
+{"timestamp": "2025-08-11T13:18:00Z", "level": "INFO", "correlation_id": "-", "logger": "uvicorn.error:94", "message": "Finished server process [8]"}
+{"timestamp": "2025-08-11T13:18:10Z", "level": "INFO", "correlation_id": "-", "logger": "uvicorn.error:62", "message": "Application startup complete."}
+{"timestamp": "2025-08-11T13:18:17Z", "level": "INFO", "correlation_id": "-", "logger": "uvicorn.error:264", "message": "Shutting down"}
+{"timestamp": "2025-08-11T13:18:17Z", "level": "INFO", "correlation_id": "-", "logger": "uvicorn.error:67", "message": "Waiting for application shutdown."}
+{"timestamp": "2025-08-11T13:18:17Z", "level": "INFO", "correlation_id": "-", "logger": "uvicorn.error:76", "message": "Application shutdown complete."}
+{"timestamp": "2025-08-11T13:18:17Z", "level": "INFO", "correlation_id": "-", "logger": "uvicorn.error:94", "message": "Finished server process [17]"}
+{"timestamp": "2025-08-11T13:19:35Z", "level": "INFO", "correlation_id": "-", "logger": "uvicorn.error:62", "message": "Application startup complete."}
+{"timestamp": "2025-08-11T13:20:13Z", "level": "INFO", "correlation_id": "-", "logger": "uvicorn.error:264", "message": "Shutting down"}
+{"timestamp": "2025-08-11T13:20:13Z", "level": "INFO", "correlation_id": "-", "logger": "uvicorn.error:67", "message": "Waiting for application shutdown."}
+{"timestamp": "2025-08-11T13:20:13Z", "level": "INFO", "correlation_id": "-", "logger": "uvicorn.error:76", "message": "Application shutdown complete."}
+{"timestamp": "2025-08-11T13:20:13Z", "level": "INFO", "correlation_id": "-", "logger": "uvicorn.error:94", "message": "Finished server process [8]"}

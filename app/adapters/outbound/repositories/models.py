@@ -1,11 +1,10 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import declarative_base, relationship
 
-from app.db import Base
+Base = declarative_base()
 
 
-
-class User(Base):
+class DBUser(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -15,10 +14,10 @@ class User(Base):
 
     # Lazy is workaround for async, use either "subquery" or "selectin"
     # More info: https://github.com/tiangolo/fastapi/pull/2331#issuecomment-801461215 and https://github.com/tiangolo/fastapi/pull/2331#issuecomment-807528963
-    items = relationship("Item", back_populates="owner", lazy="subquery")
+    items = relationship("DBItem", back_populates="owner", lazy="subquery")
 
 
-class Item(Base):
+class DBItem(Base):
     __tablename__ = "items"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -26,4 +25,4 @@ class Item(Base):
     description = Column(String, index=True)
     owner_id = Column(Integer, ForeignKey("users.id"))
 
-    owner = relationship("User", back_populates="items")
+    owner = relationship("DBUser", back_populates="items")

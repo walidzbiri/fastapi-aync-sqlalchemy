@@ -1,14 +1,13 @@
-import time
 import json
 import logging
+import time
 import traceback
-from typing import Callable
+from collections.abc import Callable
+
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import JSONResponse
-from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
-logger = logging.getLogger(__name__)  # match your logging config
+logger = logging.getLogger(__name__)
 
 
 class RequestContextMiddleware(BaseHTTPMiddleware):
@@ -49,25 +48,35 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
                 content=response_body,
                 status_code=response.status_code,
                 headers=dict(response.headers),
-                media_type=response.media_type
+                media_type=response.media_type,
             )
 
         except Exception as exc:
             exception = str(exc)
             tb = traceback.format_exc()
 
-            # Create JSON error response manually
-            error_content = {"detail": "Internal Server Error"}
-            response_body = json.dumps(error_content).encode("utf-8")  # <-- capture this
-
-            response = JSONResponse(
-                status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-                content=error_content,
+            # Log the exception context here (before re-raising)
+            duration = time.perf_counter() - start_time
+            logger.error(
+                "HTTP Request Exception Context Log",
+                extra={
+                    "method": request.method,
+                    "path": request.url.path,
+                    "query_params": str(request.query_params),
+                    "duration": f"{duration:.4f} seconds",
+                    "request_body": request_body,
+                    "client": request.client.host if request.client else "-",
+                    "user_agent": request.headers.get("user-agent", "-"),
+                    "exception": exception,
+                    "traceback": tb,
+                },
             )
 
-        duration = time.perf_counter() - start_time
+            # Re-raise the exception so FastAPI exception handlers can process it
+            raise exc
 
-        # Log full context
+        # Log successful requests
+        duration = time.perf_counter() - start_time
         logger.info(
             "HTTP Request Context Log",
             extra={
@@ -80,8 +89,6 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
                 "response_body": self._safe_json(response_body),
                 "client": request.client.host if request.client else "-",
                 "user_agent": request.headers.get("user-agent", "-"),
-                "exception": exception,
-                "traceback": tb,
             },
         )
 

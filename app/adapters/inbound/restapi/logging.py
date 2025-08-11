@@ -1,0 +1,80 @@
+import json
+import logging
+import os
+from logging.config import dictConfig
+
+
+class CustomJsonFormatter(logging.Formatter):
+    def format(self, record):
+        # Create the log record dict with renamed fields
+        log_record = {
+            "timestamp": self.formatTime(record, "%Y-%m-%dT%H:%M:%SZ"),
+            "level": record.levelname,
+            "correlation_id": getattr(record, "correlation_id", "-"),
+            "logger": f"{record.name}:{record.lineno}",
+            "message": record.getMessage(),
+        }
+        for attr in [
+            "duration",
+            "method",
+            "path",
+            "status_code",
+            "request_body",
+            "response_body",
+            "query_params",
+            "client",
+            "user_agent",
+            "exception",
+            "traceback",
+        ]:
+            if hasattr(record, attr):
+                log_record[attr] = getattr(record, attr)
+
+        return json.dumps(log_record)
+
+
+def configure_logging() -> None:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    # Define log file path relative to this directory
+    LOG_FILE = os.path.join(BASE_DIR, "app.log")
+    dictConfig(
+        {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "filters": {
+                "correlation_id": {
+                    "()": "asgi_correlation_id.CorrelationIdFilter",
+                    "uuid_length": 32,
+                    "default_value": "-",
+                },
+            },
+            "formatters": {
+                "json": {
+                    "()": CustomJsonFormatter,
+                },
+            },
+            "handlers": {
+                "console": {
+                    "class": "logging.StreamHandler",
+                    "filters": ["correlation_id"],
+                    "formatter": "json",
+                },
+                "file": {
+                    "class": "logging.FileHandler",
+                    "filename": LOG_FILE,
+                    "filters": ["correlation_id"],
+                    "formatter": "json",
+                },
+            },
+            "loggers": {
+                "app": {"handlers": ["console", "file"], "level": "INFO"},
+                "sqlalchemy": {"handlers": ["console", "file"], "level": "ERROR"},
+                "httpx": {"handlers": ["console", "file"], "level": "INFO"},
+                "asgi_correlation_id": {
+                    "handlers": ["console", "file"],
+                    "level": "WARNING",
+                },
+                "uvicorn": {"handlers": ["console", "file"], "level": "INFO"},
+            },
+        }
+    )
