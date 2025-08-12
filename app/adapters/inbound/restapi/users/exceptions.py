@@ -8,7 +8,7 @@ class UserNotFound(APIError):
     status_code = HTTPStatus.NOT_FOUND
     detail = "User with id:{user_id} was not found"
 
-    def __init__(self, user_id: str):
+    def __init__(self, user_id: int):
         super().__init__(
             detail=self.detail.format(user_id=user_id),
             status_code=self.status_code,

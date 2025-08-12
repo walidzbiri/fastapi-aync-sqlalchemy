@@ -2,16 +2,20 @@ import json
 import logging
 import time
 import traceback
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 from fastapi import Request, Response
+from fastapi.responses import StreamingResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 logger = logging.getLogger(__name__)
 
 
 class RequestContextMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next: Callable):
+    async def dispatch(
+        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
         # Ignore certain paths like openapi.json
         if request.url.path in ["/openapi.json", "/docs"]:
             return await call_next(request)
@@ -30,12 +34,11 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
             request_body = "<unreadable>"
 
         # Clone request stream for downstream usage
-        async def receive():
+        async def receive() -> dict[str, str | bytes]:
             return {"type": "http.request", "body": request_body_bytes}
 
         request._receive = receive  # allow downstream to read again
 
-        response = None
         exception = None
         tb = None
         response_body = b""
@@ -44,8 +47,9 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
 
             # Read response body
+            assert isinstance(response, StreamingResponse)
             async for chunk in response.body_iterator:
-                response_body += chunk
+                response_body += chunk  # type: ignore
 
             # Recreate response
             response = Response(
@@ -98,7 +102,7 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
 
         return response
 
-    def _safe_json(self, body: bytes):
+    def _safe_json(self, body: bytes) -> Any:
         try:
             decoded = body.decode("utf-8")
             return json.loads(decoded)

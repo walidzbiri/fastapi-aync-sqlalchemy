@@ -5,7 +5,7 @@ from logging.config import dictConfig
 
 
 class CustomJsonFormatter(logging.Formatter):
-    def format(self, record):
+    def format(self, record: logging.LogRecord) -> str:
         # Create the log record dict with renamed fields
         log_record = {
             "timestamp": self.formatTime(record, "%Y-%m-%dT%H:%M:%SZ"),

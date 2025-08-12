@@ -33,5 +33,5 @@ def user_repository_dependency(
 
 def user_service_dependency(
     user_repository: Annotated[UserRepositoryPort, Depends(user_repository_dependency)],
-):
+) -> UserService:
     return UserService(user_repository=user_repository)

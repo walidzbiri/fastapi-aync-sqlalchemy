@@ -47,7 +47,7 @@ dependencies = [
     { name = "httpx" },
     { name = "loguru" },
     { name = "python-json-logger" },
-    { name = "sqlalchemy", extra = ["asyncio"] },
+    { name = "sqlalchemy", extra = ["asyncio", "mypy"] },
     { name = "starlette" },
 ]
 
@@ -70,7 +70,7 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "loguru", specifier = ">=0.7.3" },
     { name = "python-json-logger", specifier = ">=3.3.0" },
-    { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.42" },
+    { name = "sqlalchemy", extras = ["asyncio", "mypy"], specifier = ">=2.0.42" },
     { name = "starlette", specifier = ">=0.47.2" },
 ]
 
@@ -841,6 +841,9 @@ wheels = [
 [package.optional-dependencies]
 asyncio = [
     { name = "greenlet" },
+]
+mypy = [
+    { name = "mypy" },
 ]
 
 [[package]]

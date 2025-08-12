@@ -30,7 +30,7 @@ class InternalServerError(APIError):
     status_code = HTTPStatus.INTERNAL_SERVER_ERROR
     detail = "Internal server error, please try later or contact support team"
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(
             detail=self.detail, status_code=self.status_code, error_code=self.error_code
         )
