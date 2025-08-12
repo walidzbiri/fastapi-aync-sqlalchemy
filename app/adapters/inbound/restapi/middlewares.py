@@ -12,6 +12,11 @@ logger = logging.getLogger(__name__)
 
 class RequestContextMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: Callable):
+        # Ignore certain paths like openapi.json
+        if request.url.path in ["/openapi.json", "/docs"]:
+            return await call_next(request)
+
+
         start_time = time.perf_counter()
 
         # Read request body

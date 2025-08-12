@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -16,7 +17,7 @@ user_router = APIRouter()
 
 
 @user_router.post(
-    "/users/",
+    "/users",
     responses={
         UserAlreadyExists.status_code: {"model": UserAlreadyExists.schema()},
         InternalServerError.status_code: {"model": InternalServerError.schema()},
@@ -48,3 +49,33 @@ async def get_user_by_id(
     except EntityNotFound:
         raise UserNotFound(user_id=user_id)
     return User.from_domain(domain_user=user)
+
+
+@user_router.get(
+    "/users",
+    responses={
+        InternalServerError.status_code: {"model": InternalServerError.schema()},
+    },
+)
+async def get_users(
+    user_service: Annotated[UserService, Depends(user_service_dependency)],
+) -> list[User]:
+    users = await user_service.get_users()
+    return [User.from_domain(domain_user=user) for user in users]
+
+
+@user_router.delete(
+    "/users/{user_id}",
+    responses={
+        UserNotFound.status_code: {"model": UserNotFound.schema()},
+        InternalServerError.status_code: {"model": InternalServerError.schema()},
+    },
+    status_code=HTTPStatus.NO_CONTENT,
+)
+async def delete_user(
+    user_id: int, user_service: Annotated[UserService, Depends(user_service_dependency)]
+) -> None:
+    try:
+        await user_service.delete_user(user_id=user_id)
+    except EntityNotFound:
+        raise UserNotFound(user_id=user_id)

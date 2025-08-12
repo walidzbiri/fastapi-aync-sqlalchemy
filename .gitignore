@@ -365,3 +365,4 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/python,macos,windows,visualstudiocode,pycharm
+app/adapters/inbound/restapi/app.log

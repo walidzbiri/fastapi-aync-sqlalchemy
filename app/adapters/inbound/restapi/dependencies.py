@@ -2,18 +2,23 @@ from collections.abc import AsyncGenerator
 from typing import Annotated
 
 from fastapi import Depends
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 
 from app.adapters.outbound.repositories.user_repository import PostgreSqlUserRepository
 from app.domain.ports.user_repository import UserRepositoryPort
 from app.domain.services.user_service import UserService
 
 SQLALCHEMY_DATABASE_URL = "postgresql+asyncpg://postgres:changeme@postgres/postgres"
-engine = create_async_engine(SQLALCHEMY_DATABASE_URL)
 
 
-async def sqlalchemy_session_dependency() -> AsyncGenerator[AsyncSession, None]:
-    session = AsyncSession(engine, expire_on_commit=True)
+async def async_engine_dependency() -> AsyncEngine:
+    return create_async_engine(SQLALCHEMY_DATABASE_URL)
+
+
+async def sqlalchemy_session_dependency(
+    sqlalchemy_engine: Annotated[AsyncEngine, Depends(async_engine_dependency)],
+) -> AsyncGenerator[AsyncSession, None]:
+    session = AsyncSession(sqlalchemy_engine, expire_on_commit=True)
     try:
         yield session
     finally:

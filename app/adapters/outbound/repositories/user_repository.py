@@ -1,6 +1,5 @@
 from logging import getLogger
 
-from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -52,9 +51,9 @@ class PostgreSqlUserRepository(UserRepositoryPort):
         raise EntityAlreadyExists("Email already registered")
 
     async def delete_user(self, user_id: int) -> None:
-        db_user = await self._session.get(User, user_id)
+        db_user = await self._session.get(DBUser, user_id)
         if not db_user:
             logger.warning(f"User with id: {user_id} not found")
-            raise HTTPException(status_code=404, detail="User not found")
+            raise EntityNotFound("User not found")
         await self._session.delete(db_user)
         await self._session.commit()
