@@ -19,7 +19,7 @@ class UserNotFound(APIError):
 class UserAlreadyExists(APIError):
     error_code = "USER.0002"
     status_code = HTTPStatus.CONFLICT
-    detail = "User with email:{email} was already registred"
+    detail = "User with email:{email} was already registered"
 
     def __init__(self, email: str):
         super().__init__(

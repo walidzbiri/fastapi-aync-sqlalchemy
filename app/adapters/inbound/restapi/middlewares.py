@@ -16,7 +16,6 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         if request.url.path in ["/openapi.json", "/docs"]:
             return await call_next(request)
 
-
         start_time = time.perf_counter()
 
         # Read request body

@@ -55,7 +55,7 @@ class TestUserRoutes:
         assert response.status_code == HTTPStatus.CONFLICT
         assert response.json() == {
             "error": "USER.0002",
-            "detail": "User with email:john.doe@email.com was already registred",
+            "detail": "User with email:john.doe@email.com was already registered",
         }
 
     async def test_get_user_by_id__happy_path(

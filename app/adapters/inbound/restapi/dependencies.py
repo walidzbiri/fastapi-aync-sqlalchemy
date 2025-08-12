@@ -17,7 +17,7 @@ async def async_engine_dependency() -> AsyncEngine:
 
 async def sqlalchemy_session_dependency(
     sqlalchemy_engine: Annotated[AsyncEngine, Depends(async_engine_dependency)],
-) -> AsyncGenerator[AsyncSession, None]:
+) -> AsyncGenerator[AsyncSession]:
     session = AsyncSession(sqlalchemy_engine, expire_on_commit=True)
     try:
         yield session

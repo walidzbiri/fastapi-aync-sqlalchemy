@@ -1,0 +1,30 @@
+version: 2
+updates:
+  # Python uv
+  - package-ecosystem: uv
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "build(uv):"
+    groups:
+      update-modules:
+        patterns:
+          - '*'
+        update-types:
+          - minor
+          - patch
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "build(gha):"
+    groups:
+      update-modules:
+        patterns:
+          - '*'
+        update-types:
+          - minor
+          - patch

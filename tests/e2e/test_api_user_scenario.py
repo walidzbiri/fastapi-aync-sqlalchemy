@@ -58,7 +58,7 @@ class TestUsersAPI:
             assert created_user2_response.status_code == HTTPStatus.CONFLICT
             assert created_user2_response.json() == {
                 "error": "USER.0002",
-                "detail": "User with email:bob@email.com was already registred",
+                "detail": "User with email:bob@email.com was already registered",
             }
 
             users_list_response = await client.get("/users")

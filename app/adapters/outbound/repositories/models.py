@@ -12,7 +12,7 @@ class DBUser(Base):
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
 
-    # Lazy is workaround for async, use either "subquery" or "selectin"
+    # Lazy is workaround for async, use either "subquery" or "selectin" # noqa
     # More info: https://github.com/tiangolo/fastapi/pull/2331#issuecomment-801461215 and https://github.com/tiangolo/fastapi/pull/2331#issuecomment-807528963
     items = relationship("DBItem", back_populates="owner", lazy="subquery")
 
