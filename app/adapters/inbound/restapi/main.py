@@ -8,7 +8,6 @@ from fastapi.responses import JSONResponse
 from app.adapters.inbound.restapi.dependencies import async_engine_dependency
 from app.adapters.inbound.restapi.exceptions import APIError, InternalServerError
 from app.adapters.inbound.restapi.logging import configure_logging
-from app.adapters.inbound.restapi.middlewares import RequestContextMiddleware
 from app.adapters.inbound.restapi.users.routes import user_router
 from app.adapters.outbound.repositories.models import Base
 
@@ -24,7 +23,6 @@ async def lifespan(_: FastAPI) -> AsyncGenerator[None]:  # noqa: ARG001
 
 app = FastAPI(lifespan=lifespan)
 
-app.add_middleware(RequestContextMiddleware)
 app.add_middleware(CorrelationIdMiddleware)
 
 

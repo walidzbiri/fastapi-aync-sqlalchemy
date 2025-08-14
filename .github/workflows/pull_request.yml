@@ -35,6 +35,6 @@ jobs:
       - name: Run Ruff formatter
         run: uv run ruff format --check
       - name: Run mypy static type checker
-        run: uv run mypy src/
+        run: uv run mypy app/
       - name: Run pytest
         run: uv run pytest --cov=app --cov-fail-under=80
