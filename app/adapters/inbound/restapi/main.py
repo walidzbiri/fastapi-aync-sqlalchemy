@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 
 from app.adapters.inbound.restapi.dependencies import async_engine_dependency
 from app.adapters.inbound.restapi.exceptions import APIError, InternalServerError
+from app.adapters.inbound.restapi.items.routes import item_router
 from app.adapters.inbound.restapi.logging import configure_logging
 from app.adapters.inbound.restapi.users.routes import user_router
 from app.adapters.outbound.repositories.models import Base
@@ -50,3 +51,4 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
 
 
 app.include_router(user_router)
+app.include_router(item_router)

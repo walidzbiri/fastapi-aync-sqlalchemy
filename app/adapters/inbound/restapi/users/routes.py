@@ -5,15 +5,16 @@ from fastapi import APIRouter, Depends
 
 from app.adapters.inbound.restapi.dependencies import user_service_dependency
 from app.adapters.inbound.restapi.exceptions import InternalServerError
+from app.adapters.inbound.restapi.shared.models import User
 from app.adapters.inbound.restapi.users.exceptions import (
     UserAlreadyExists,
     UserNotFound,
 )
-from app.adapters.inbound.restapi.users.models import CreateUserRequest, User
+from app.adapters.inbound.restapi.users.models import CreateUserRequest
 from app.domain.ports.exceptions import EntityAlreadyExists, EntityNotFound
 from app.domain.services.user_service import UserService
 
-user_router = APIRouter()
+user_router = APIRouter(tags=["users"])
 
 
 @user_router.post(

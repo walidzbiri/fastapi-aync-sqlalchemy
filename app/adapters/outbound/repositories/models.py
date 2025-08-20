@@ -1,7 +1,10 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
-from sqlalchemy.orm import Mapped, declarative_base, relationship
+from sqlalchemy.ext.asyncio import AsyncAttrs
+from sqlalchemy.orm import DeclarativeBase, Mapped, relationship
 
-Base = declarative_base()
+
+class Base(AsyncAttrs, DeclarativeBase):
+    pass
 
 
 class DBUser(Base):
@@ -12,11 +15,7 @@ class DBUser(Base):
     hashed_password: Mapped[str] = Column(String)
     is_active: Mapped[bool] = Column(Boolean, default=True)
 
-    # Lazy is workaround for async, use either "subquery" or "selectin" # noqa
-    # More info: https://github.com/tiangolo/fastapi/pull/2331#issuecomment-801461215 and https://github.com/tiangolo/fastapi/pull/2331#issuecomment-807528963
-    items: Mapped[list["DBItem"]] = relationship(
-        "DBItem", back_populates="owner", lazy="subquery"
-    )
+    items: Mapped[list["DBItem"]] = relationship("DBItem", back_populates="owner")
 
 
 class DBItem(Base):

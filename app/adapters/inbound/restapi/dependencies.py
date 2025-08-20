@@ -4,8 +4,11 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 
+from app.adapters.outbound.repositories.item_repository import PostgreSqlItemRepository
 from app.adapters.outbound.repositories.user_repository import PostgreSqlUserRepository
+from app.domain.ports.item_repository import ItemRepositoryPort
 from app.domain.ports.user_repository import UserRepositoryPort
+from app.domain.services.item_service import ItemService
 from app.domain.services.user_service import UserService
 
 SQLALCHEMY_DATABASE_URL = "postgresql+asyncpg://postgres:changeme@postgres/postgres"
@@ -18,7 +21,7 @@ async def async_engine_dependency() -> AsyncEngine:
 async def sqlalchemy_session_dependency(
     sqlalchemy_engine: Annotated[AsyncEngine, Depends(async_engine_dependency)],
 ) -> AsyncGenerator[AsyncSession]:
-    session = AsyncSession(sqlalchemy_engine, expire_on_commit=True)
+    session = AsyncSession(sqlalchemy_engine, expire_on_commit=False)
     try:
         yield session
     finally:
@@ -35,3 +38,15 @@ def user_service_dependency(
     user_repository: Annotated[UserRepositoryPort, Depends(user_repository_dependency)],
 ) -> UserService:
     return UserService(user_repository=user_repository)
+
+
+def item_repository_dependency(
+    sqlalchemy_session: Annotated[AsyncSession, Depends(sqlalchemy_session_dependency)],
+) -> ItemRepositoryPort:
+    return PostgreSqlItemRepository(session=sqlalchemy_session)
+
+
+def item_service_dependency(
+    item_repository: Annotated[ItemRepositoryPort, Depends(item_repository_dependency)],
+) -> UserService:
+    return ItemService(item_repository=item_repository)
