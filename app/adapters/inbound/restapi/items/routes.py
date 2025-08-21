@@ -30,7 +30,7 @@ async def create_user_item(
             command=payload.to_domain(owner_id=user_id)
         )
     except EntityNotFound:
-        raise UserNotFound(user_id=payload.owner_id)
+        raise UserNotFound(user_id)
     return Item.from_domain(domain_item=item)
 
 

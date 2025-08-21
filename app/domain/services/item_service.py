@@ -9,8 +9,8 @@ class ItemService:
     async def create_user_item(self, command: CreateItemCommand) -> Item:
         return await self._item_repository.create_user_item(command)
 
-    async def get_user_items(self, user_id: int) -> Item:
+    async def get_user_items(self, user_id: int) -> list[Item]:
         return await self._item_repository.get_user_items(user_id)
 
-    async def get_all_items(self) -> Item:
+    async def get_all_items(self) -> list[Item]:
         return await self._item_repository.get_items()

@@ -1,6 +1,6 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import ForeignKey
 from sqlalchemy.ext.asyncio import AsyncAttrs
-from sqlalchemy.orm import DeclarativeBase, Mapped, relationship
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
 class Base(AsyncAttrs, DeclarativeBase):
@@ -10,10 +10,10 @@ class Base(AsyncAttrs, DeclarativeBase):
 class DBUser(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = Column(Integer, primary_key=True, index=True)
-    email: Mapped[str] = Column(String, unique=True, index=True)
-    hashed_password: Mapped[str] = Column(String)
-    is_active: Mapped[bool] = Column(Boolean, default=True)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    email: Mapped[str] = mapped_column(unique=True, index=True)
+    hashed_password: Mapped[str]
+    is_active: Mapped[bool] = mapped_column(default=True)
 
     items: Mapped[list["DBItem"]] = relationship("DBItem", back_populates="owner")
 
@@ -21,9 +21,9 @@ class DBUser(Base):
 class DBItem(Base):
     __tablename__ = "items"
 
-    id: Mapped[int] = Column(Integer, primary_key=True, index=True)
-    title: Mapped[str] = Column(String, index=True)
-    description: Mapped[str] = Column(String, index=True)
-    owner_id: Mapped[int] = Column(Integer, ForeignKey("users.id"))
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    title: Mapped[str] = mapped_column(index=True)
+    description: Mapped[str] = mapped_column(index=True)
+    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
     owner: Mapped["DBUser"] = relationship("DBUser", back_populates="items")

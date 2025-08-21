@@ -48,5 +48,5 @@ def item_repository_dependency(
 
 def item_service_dependency(
     item_repository: Annotated[ItemRepositoryPort, Depends(item_repository_dependency)],
-) -> UserService:
+) -> ItemService:
     return ItemService(item_repository=item_repository)
