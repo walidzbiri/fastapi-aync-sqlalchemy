@@ -1,20 +1,22 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
-from asgi_correlation_id import CorrelationIdMiddleware, correlation_id
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from app.adapters.inbound.restapi.dependencies import async_engine_dependency
 from app.adapters.inbound.restapi.exceptions import APIError, InternalServerError
-from app.adapters.inbound.restapi.logging import configure_logging
+from app.adapters.inbound.restapi.logging_config import setup_logging
+from app.adapters.inbound.restapi.middlewares import (
+    CorrelationIdMiddleware,
+)
 from app.adapters.inbound.restapi.users.routes import user_router
 from app.adapters.outbound.repositories.models import Base
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncGenerator[None]:  # noqa: ARG001
-    configure_logging()
+    setup_logging()
     engine = await async_engine_dependency()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -32,7 +34,6 @@ async def custom_exception_handler(request: Request, exc: APIError) -> JSONRespo
         status_code=exc.status_code,
         content={"error": exc.error_code, "detail": exc.detail},
     )
-
     return response
 
 
@@ -43,9 +44,6 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
         status_code=internal_error.status_code,
         content={"error": internal_error.error_code, "detail": internal_error.detail},
     )
-    cid = correlation_id.get()
-    if cid:
-        response.headers["x-request-id"] = cid
     return response
 
 
