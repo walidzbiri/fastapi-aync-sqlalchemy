@@ -20,7 +20,12 @@ class PostgreSqlUserRepository(UserRepositoryPort):
         if db_user is None:
             logger.warning(f"User with id: {user_id} not found")
             raise EntityNotFound("User not found")
-        return User.model_validate(db_user)
+        return User(
+            id=db_user.id,
+            email=db_user.email,
+            is_active=db_user.is_active,
+            items=await db_user.awaitable_attrs.items,
+        )
 
     async def get_user_by_email(self, email: str) -> User:
         query = select(DBUser).where(DBUser.email == email)
@@ -29,13 +34,26 @@ class PostgreSqlUserRepository(UserRepositoryPort):
         if db_user is None:
             logger.warning(f"User with email: {email} not found")
             raise EntityNotFound("User not found")
-        return User.model_validate(db_user)
+        return User(
+            id=db_user.id,
+            email=db_user.email,
+            is_active=db_user.is_active,
+            items=await db_user.awaitable_attrs.items,
+        )
 
     async def get_users(self, skip: int = 0, limit: int = 100) -> list[User]:
         query = select(DBUser).offset(skip).limit(limit)
         result = await self._session.execute(query)
         db_users = result.scalars().all()
-        return [User.model_validate(db_user) for db_user in db_users]
+        return [
+            User(
+                id=db_user.id,
+                email=db_user.email,
+                is_active=db_user.is_active,
+                items=await db_user.awaitable_attrs.items,
+            )
+            for db_user in db_users
+        ]
 
     async def create_user(self, command: CreateUserCommand) -> User:
         try:
@@ -46,7 +64,12 @@ class PostgreSqlUserRepository(UserRepositoryPort):
             self._session.add(db_user)
             await self._session.commit()
             await self._session.refresh(db_user)
-            return User.model_validate(db_user)
+            return User(
+                id=db_user.id,
+                email=db_user.email,
+                is_active=db_user.is_active,
+                items=await db_user.awaitable_attrs.items,
+            )
         logger.warning(f"User with email: {command.email} already registered")
         raise EntityAlreadyExists("Email already registered")
 

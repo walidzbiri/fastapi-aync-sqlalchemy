@@ -35,6 +35,7 @@ class TestUserRoutes:
         assert response.json() == {
             "id": ANY,
             "email": "john.doe@email.com",
+            "items": [],
         }
 
     async def test_create_user__already_exists(
@@ -76,10 +77,7 @@ class TestUserRoutes:
 
         # THEN
         assert response.status_code == HTTPStatus.OK
-        assert response.json() == {
-            "id": 1,
-            "email": "john.doe@email.com",
-        }
+        assert response.json() == {"id": 1, "email": "john.doe@email.com", "items": []}
 
     async def test_get_user_by_id__not_found(
         self, fast_api_app: FastAPI, user_service_mock: UserService
@@ -126,14 +124,8 @@ class TestUserRoutes:
         # THEN
         assert response.status_code == HTTPStatus.OK
         assert response.json() == [
-            {
-                "id": 1,
-                "email": "john.doe@email.com",
-            },
-            {
-                "id": 2,
-                "email": "sofie.doe@email.com",
-            },
+            {"id": 1, "email": "john.doe@email.com", "items": []},
+            {"id": 2, "email": "sofie.doe@email.com", "items": []},
         ]
 
     async def test_deleted_user_by_id__happy_path(

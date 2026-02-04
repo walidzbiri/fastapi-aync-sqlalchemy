@@ -50,7 +50,11 @@ class TestUsersAPI:
                 "/users", json={"email": "bob@email.com", "password": "bob"}
             )
             assert created_user_response.status_code == HTTPStatus.OK
-            assert created_user_response.json() == {"id": 1, "email": "bob@email.com"}
+            assert created_user_response.json() == {
+                "id": 1,
+                "email": "bob@email.com",
+                "items": [],
+            }
 
             created_user2_response = await client.post(
                 "/users", json={"email": "bob@email.com", "password": "bob"}
@@ -63,7 +67,9 @@ class TestUsersAPI:
 
             users_list_response = await client.get("/users")
             assert users_list_response.status_code == HTTPStatus.OK
-            assert users_list_response.json() == [{"id": 1, "email": "bob@email.com"}]
+            assert users_list_response.json() == [
+                {"id": 1, "email": "bob@email.com", "items": []}
+            ]
 
             deleted_user = await client.delete("/users/1")
             assert deleted_user.status_code == HTTPStatus.NO_CONTENT
